@@ -142,12 +142,16 @@ def _get_project_config():
 
     Expects to be called from within the project root.
     """
-    global_paths = (
-        # Load the global config found in the manifest repo.
-        os.path.join(rh.git.find_repo_root(), '.repo', 'manifests'),
-        # Load the global config found in the root of the repo checkout.
-        rh.git.find_repo_root(),
-    )
+    try:
+        global_paths = (
+            # Load the global config found in the manifest repo.
+            os.path.join(rh.git.find_repo_root(), '.repo', 'manifests'),
+            # Load the global config found in the root of the repo checkout.
+            rh.git.find_repo_root(),
+        )
+    except ValueError:
+        global_paths = ()
+
     paths = (
         # Load the config for this git repo.
         '.',

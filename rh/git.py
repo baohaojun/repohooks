@@ -32,14 +32,8 @@ import rh.utils
 def get_upstream_remote():
     """Returns the current upstream remote name."""
     # First get the current branch name.
-    cmd = ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
-    result = rh.utils.run_command(cmd, capture_output=True)
-    branch = result.output.strip()
-
-    # Then get the remote associated with this branch.
-    cmd = ['git', 'config', 'branch.%s.remote' % branch]
-    result = rh.utils.run_command(cmd, capture_output=True)
-    return result.output.strip()
+    remote = rh.utils.run_command(['repo-remote'], capture_output=True).output.strip()
+    return remote
 
 
 def get_upstream_branch():
@@ -48,26 +42,8 @@ def get_upstream_branch():
     Raises:
       Error if there is no tracking branch
     """
-    cmd = ['git', 'symbolic-ref', 'HEAD']
-    result = rh.utils.run_command(cmd, capture_output=True)
-    current_branch = result.output.strip().replace('refs/heads/', '')
-    if not current_branch:
-        raise ValueError('Need to be on a tracking branch')
-
-    cfg_option = 'branch.' + current_branch + '.%s'
-    cmd = ['git', 'config', cfg_option % 'merge']
-    result = rh.utils.run_command(cmd, capture_output=True)
-    full_upstream = result.output.strip()
-    # If remote is not fully qualified, add an implicit namespace.
-    if '/' not in full_upstream:
-        full_upstream = 'refs/heads/%s' % full_upstream
-    cmd = ['git', 'config', cfg_option % 'remote']
-    result = rh.utils.run_command(cmd, capture_output=True)
-    remote = result.output.strip()
-    if not remote or not full_upstream:
-        raise ValueError('Need to be on a tracking branch')
-
-    return full_upstream.replace('heads', 'remotes/' + remote)
+    remote = rh.utils.run_command(['repo-remote-branch'], capture_output=True).output.strip()
+    return "refs/remotes/" + remote
 
 
 def get_commit_for_ref(ref):

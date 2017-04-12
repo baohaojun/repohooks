@@ -119,7 +119,10 @@ class Placeholders(object):
     @property
     def var_REPO_ROOT(self):
         """The root of the repo checkout."""
-        return rh.git.find_repo_root()
+        try:
+            return rh.git.find_repo_root()
+        except ValueError:
+            return "."
 
     @property
     def var_BUILD_OS(self):
